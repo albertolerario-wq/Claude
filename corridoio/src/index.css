@@ -1,0 +1,107 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #f7f6f2;
+  --color-bg-card: #ffffff;
+  --color-accent: #e8622a;
+  --color-slate-c: #3d5a80;
+  --color-bordeaux: #7d2d3a;
+  --color-dissoluzione: #b8c8e0;
+  --color-sovraccarico: #e8b4a0;
+  --color-warn: #c8860a;
+  --color-stable: #2d6a4f;
+  --color-loop: #7d2d3a;
+
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-serif: 'EB Garamond', Georgia, serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: #f7f6f2;
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #1a1a1a;
+}
+
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- Pulse animation for corridor today-point ---- */
+@keyframes pulse-ring {
+  0%   { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(2.8); opacity: 0; }
+}
+.pulse-ring {
+  animation: pulse-ring 2s ease-out infinite;
+}
+.pulse-ring-delay {
+  animation: pulse-ring 2s ease-out 0.7s infinite;
+}
+
+/* ---- Breath circle ---- */
+@keyframes breathe-expand {
+  from { transform: scale(1); }
+  to   { transform: scale(1.5); }
+}
+@keyframes breathe-contract {
+  from { transform: scale(1.5); }
+  to   { transform: scale(1); }
+}
+@keyframes breathe-hold-big {
+  from { transform: scale(1.5); }
+  to   { transform: scale(1.5); }
+}
+@keyframes breathe-hold-small {
+  from { transform: scale(1); }
+  to   { transform: scale(1); }
+}
+
+/* ---- Focus ---- */
+:focus-visible {
+  outline: 2px solid #e8622a;
+  outline-offset: 2px;
+}
+
+/* ---- Tap targets ---- */
+button, [role="button"] {
+  cursor: pointer;
+}
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+
+/* ---- Card shadow ---- */
+.shadow-card {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+}
+
+/* ---- Garamond text ---- */
+.font-garamond {
+  font-family: 'EB Garamond', Georgia, serif;
+}
+
+/* ---- Dark mode (optional, opt-in) ---- */
+.dark {
+  --color-bg: #1a1a1a;
+  --color-bg-card: #252525;
+  color: #e8e8e8;
+  background-color: #1a1a1a;
+}
+
+.dark body {
+  background-color: #1a1a1a;
+}
