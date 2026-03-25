@@ -3,7 +3,7 @@ name: Deploy Corridoio to GitHub Pages
 on:
   push:
     branches:
-      - master
+      - main
     paths:
       - 'corridoio/**'
   workflow_dispatch:
