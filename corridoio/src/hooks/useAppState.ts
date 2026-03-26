@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import type { AppState, DailyEntry, GroupProjectState } from '../types';
+import type { AppState, DailyEntry, GroupProjectState, ElaborazioneEntry, MomentoEvent } from '../types';
 import { INITIAL_PROBLEMS } from '../data/problems';
 
 const STORAGE_KEY = 'corridoio_state';
@@ -26,6 +26,8 @@ const defaultState: AppState = {
   groupName: '',
   settings: { slotDuration: 20, firstRun: true, darkMode: false },
   groupProject: defaultGroupProject,
+  momentoLog: [],
+  elaborazioneLog: [],
 };
 
 function loadState(): AppState {
@@ -44,6 +46,8 @@ function loadState(): AppState {
         checklist: { ...defaultGroupProject.checklist, ...(parsed.groupProject?.checklist ?? {}) },
         problems: parsed.groupProject?.problems ?? defaultGroupProject.problems,
       },
+      momentoLog: parsed.momentoLog ?? [],
+      elaborazioneLog: parsed.elaborazioneLog ?? [],
     };
   } catch {
     return defaultState;
@@ -173,6 +177,14 @@ export function useAppState() {
     }
   }, []);
 
+  const saveMomento = useCallback((event: MomentoEvent) => {
+    setState(s => ({ ...s, momentoLog: [...s.momentoLog, event] }));
+  }, []);
+
+  const saveElaborazione = useCallback((entry: ElaborazioneEntry) => {
+    setState(s => ({ ...s, elaborazioneLog: [...s.elaborazioneLog, entry] }));
+  }, []);
+
   const clearData = useCallback(() => {
     setState({ ...defaultState });
   }, []);
@@ -194,6 +206,8 @@ export function useAppState() {
     exportData,
     importData,
     clearData,
+    saveMomento,
+    saveElaborazione,
     todayStr,
   };
 }

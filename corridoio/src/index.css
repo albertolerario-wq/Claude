@@ -94,6 +94,22 @@ button, [role="button"] {
   font-family: 'EB Garamond', Georgia, serif;
 }
 
+/* ---- Cosmic position UMANO pulse ---- */
+@keyframes cosmic-pulse-ring {
+  0%   { transform: scale(1);   opacity: 0.65; }
+  100% { transform: scale(4);   opacity: 0;    }
+}
+.cosmic-pulse-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cosmic-pulse-ring 2.5s ease-out infinite;
+}
+.cosmic-pulse-ring-2 {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cosmic-pulse-ring 2.5s ease-out 1.25s infinite;
+}
+
 /* ---- Dark mode (optional, opt-in) ---- */
 .dark {
   --color-bg: #1a1a1a;

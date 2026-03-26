@@ -1,17 +1,21 @@
+import { lazy, Suspense } from 'react';
 import type { NavProps } from '../App';
 import Corridor from './Corridor';
 import { getDiagnosis, getGroupDiagnosis } from '../hooks/useDiagnosis';
+
+const CosmicPosition = lazy(() => import('./CosmicPosition'));
 
 interface Props extends NavProps {
   onOpenLoop: () => void;
 }
 
 const MODULE_CARDS = [
-  { id: 'entropia', label: 'Entropia', desc: 'Sonno, corpo, carico allostatico', screen: 'entropia' as const },
-  { id: 'slot', label: 'Slot', desc: 'Timer 20 minuti, pensiero libero', screen: 'slot' as const },
-  { id: 'phi', label: 'φ_rel', desc: 'Integrazione relazionale', screen: 'phi' as const },
-  { id: 'bordi', label: 'Bordi', desc: 'Posizioni ai margini del sapere', screen: 'bordi' as const },
-  { id: 'interesse', label: 'Interesse Composto', desc: 'Trend a 90 giorni', screen: 'interesse' as const },
+  { id: 'entropia',      label: 'Entropia',          desc: 'Sonno, corpo, carico allostatico',  screen: 'entropia'      as const },
+  { id: 'slot',          label: 'Slot',               desc: 'Timer 20 minuti, pensiero libero',  screen: 'slot'          as const },
+  { id: 'phi',           label: 'φ_rel',              desc: 'Integrazione relazionale',          screen: 'phi'           as const },
+  { id: 'bordi',         label: 'Bordi',              desc: 'Posizioni ai margini del sapere',   screen: 'bordi'         as const },
+  { id: 'interesse',     label: 'Interesse Composto', desc: 'Trend a 90 giorni',                 screen: 'interesse'     as const },
+  { id: 'impermanenza',  label: '◌ Impermanenza',     desc: 'finitezza come struttura',          screen: 'impermanenza'  as const },
 ];
 
 function MetricBar({ label, value, prev }: { label: string; value: number; prev?: number }) {
@@ -146,6 +150,15 @@ export default function Home({ navigate, appState }: Props) {
             style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: '0.8rem' }}
           >
             {diagnosis.readout}
+            {today && today.stabilita < 2.5 && (
+              <button
+                onClick={() => navigate('impermanenza')}
+                className="block mt-1.5 text-[#888] hover:text-[#555] transition-colors duration-200"
+                style={{ fontSize: '0.75rem' }}
+              >
+                → impermanenza disponibile
+              </button>
+            )}
           </div>
 
           {/* Metrics */}
@@ -164,6 +177,13 @@ export default function Home({ navigate, appState }: Props) {
           {!today && (
             <p className="text-xs text-[#aaa]">Nessun dato oggi</p>
           )}
+
+          {/* CosmicPosition compact widget */}
+          <div className="mt-2">
+            <Suspense fallback={<div className="h-[130px] bg-[#0a0a14] rounded-lg" />}>
+              <CosmicPosition compact onExpand={() => navigate('cosmic-position')} />
+            </Suspense>
+          </div>
         </div>
       </div>
 
