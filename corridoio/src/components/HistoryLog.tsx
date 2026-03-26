@@ -1,12 +1,35 @@
-import { useRef } from 'react';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { useRef, useMemo } from 'react';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import type { NavProps } from '../App';
 import { getDiagnosis } from '../hooks/useDiagnosis';
+import type { MomentoEvent } from '../types';
+
+function getISOWeek(dateStr: string): string {
+  const d = new Date(dateStr + 'T12:00:00');
+  const jan4 = new Date(d.getFullYear(), 0, 4);
+  const startOfWeek = new Date(jan4);
+  startOfWeek.setDate(jan4.getDate() - ((jan4.getDay() + 6) % 7));
+  const diff = d.getTime() - startOfWeek.getTime();
+  const week = Math.floor(diff / (7 * 86400000)) + 1;
+  return `W${week.toString().padStart(2, '0')}`;
+}
 
 export default function HistoryLog({ navigate, appState }: NavProps) {
   const { state, exportData, importData, clearData } = appState;
   const { log } = state;
+  const momentoLog: MomentoEvent[] = state.momentoLog ?? [];
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const momentoWeeks = useMemo(() => {
+    if (momentoLog.length === 0) return [];
+    const byWeek: Record<string, { week: string; ansia: number; noia: number; abitudine: number }> = {};
+    momentoLog.forEach(ev => {
+      const w = getISOWeek(ev.date);
+      if (!byWeek[w]) byWeek[w] = { week: w, ansia: 0, noia: 0, abitudine: 0 };
+      byWeek[w][ev.reason]++;
+    });
+    return Object.values(byWeek).sort((a, b) => a.week.localeCompare(b.week)).slice(-8);
+  }, [momentoLog]);
 
   const last30 = log.slice(0, 30).reverse().map(e => ({
     date: e.date.slice(5),
@@ -93,6 +116,28 @@ export default function HistoryLog({ navigate, appState }: NavProps) {
           Cancella dati
         </button>
       </div>
+
+      {/* Momento pattern chart */}
+      {momentoWeeks.length > 0 && (
+        <div className="bg-white rounded-xl p-4 mb-4" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+          <h2 className="text-xs text-[#888] mb-3">pattern di apertura — ultime settimane</h2>
+          <ResponsiveContainer width="100%" height={90}>
+            <BarChart data={momentoWeeks} margin={{ top: 2, right: 2, bottom: 0, left: 0 }} barSize={12}>
+              <XAxis dataKey="week" tick={{ fontSize: 9, fill: '#bbb' }} axisLine={false} tickLine={false} />
+              <YAxis hide />
+              <Tooltip
+                contentStyle={{ fontSize: 11, padding: '4px 8px', borderRadius: 6, border: 'none', boxShadow: '0 1px 4px rgba(0,0,0,0.1)' }}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                formatter={(v: any, name: any) => [v, name]}
+              />
+              <Legend wrapperStyle={{ fontSize: 9, paddingTop: 4 }} />
+              <Bar dataKey="ansia"     fill="#e8622a" stackId="a" />
+              <Bar dataKey="noia"      fill="#3d5a80" stackId="a" />
+              <Bar dataKey="abitudine" fill="#aaa"    stackId="a" radius={[2,2,0,0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
 
       {/* Log list */}
       {log.length === 0 ? (

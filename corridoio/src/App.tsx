@@ -2,6 +2,7 @@ import { useState, lazy, Suspense } from 'react';
 import { useAppState } from './hooks/useAppState';
 import Onboarding from './components/Onboarding';
 import ModeSelect from './components/ModeSelect';
+import type { MomentoEvent } from './types';
 
 // Lazy load all heavy screens
 const Home = lazy(() => import('./components/Home'));
@@ -15,6 +16,20 @@ const InteresseComposto = lazy(() => import('./components/InteresseComposto'));
 const ProgettoGruppo = lazy(() => import('./components/ProgettoGruppo'));
 const HistoryLog = lazy(() => import('./components/HistoryLog'));
 const CosmicDiagram = lazy(() => import('./components/CosmicDiagram'));
+const CosmicPosition = lazy(() => import('./components/CosmicPosition'));
+const Impermanenza = lazy(() => import('./components/Impermanenza'));
+const Momento = lazy(() => import('./components/Momento'));
+
+const LAST_OPEN_KEY = 'corridoio_lastopen';
+const INTERVAL_MS = 30 * 60 * 1000;
+
+function checkShouldShowMomento(firstRun: boolean): boolean {
+  const now = Date.now();
+  const last = localStorage.getItem(LAST_OPEN_KEY);
+  localStorage.setItem(LAST_OPEN_KEY, String(now));
+  if (firstRun || !last) return false;
+  return now - Number(last) >= INTERVAL_MS;
+}
 
 function LoadingFallback() {
   return (
@@ -31,12 +46,15 @@ export type NavProps = {
 
 export default function App() {
   const appState = useAppState();
-  const { state, setMode } = appState;
+  const { state, setMode, saveMomento } = appState;
   const [screen, setScreen] = useState<string>(() => {
     if (state.settings.firstRun) return 'onboarding';
     return 'home';
   });
   const [loopOpen, setLoopOpen] = useState(false);
+  const [showMomento, setShowMomento] = useState(() =>
+    checkShouldShowMomento(state.settings.firstRun)
+  );
 
   function navigate(s: string) {
     setScreen(s);
@@ -73,6 +91,12 @@ export default function App() {
         {screen === 'progetto' && <ProgettoGruppo {...navProps} />}
         {screen === 'history' && <HistoryLog {...navProps} />}
         {screen === 'cosmic' && <CosmicDiagram onClose={() => navigate('home')} />}
+        {screen === 'cosmic-position' && (
+          <CosmicPosition onClose={() => navigate('home')} />
+        )}
+        {screen === 'impermanenza' && (
+          <Impermanenza {...navProps} onOpenCosmic={() => navigate('cosmic-position')} />
+        )}
       </Suspense>
 
       {/* Loop FAB */}
@@ -91,6 +115,23 @@ export default function App() {
       {loopOpen && (
         <Suspense fallback={<LoadingFallback />}>
           <LoopProtocol appState={appState} onClose={() => setLoopOpen(false)} />
+        </Suspense>
+      )}
+
+      {/* Momento overlay */}
+      {showMomento && (
+        <Suspense fallback={null}>
+          <Momento
+            onSave={(reason) => {
+              const event: MomentoEvent = {
+                date: new Date().toISOString().slice(0, 10),
+                time: new Date().toTimeString().slice(0, 5),
+                reason,
+              };
+              saveMomento(event);
+            }}
+            onDismiss={() => setShowMomento(false)}
+          />
         </Suspense>
       )}
     </div>

@@ -45,6 +45,19 @@ export interface AppSettings {
   darkMode: boolean;
 }
 
+export interface ElaborazioneEntry {
+  date: string;
+  soggetto: string;
+  differenza: string;
+  possibilita: string;
+}
+
+export interface MomentoEvent {
+  date: string;
+  time: string;
+  reason: 'ansia' | 'noia' | 'abitudine';
+}
+
 export interface AppState {
   log: DailyEntry[];
   today: DailyEntry | null;
@@ -54,6 +67,8 @@ export interface AppState {
   groupName: string;
   settings: AppSettings;
   groupProject: GroupProjectState;
+  momentoLog: MomentoEvent[];
+  elaborazioneLog: ElaborazioneEntry[];
 }
 
 export type Screen =
@@ -69,7 +84,9 @@ export type Screen =
   | 'interesse'
   | 'progetto'
   | 'history'
-  | 'cosmic';
+  | 'cosmic'
+  | 'impermanenza'
+  | 'cosmic-position';
 
 export interface DiagnosisResult {
   status: 'stable' | 'warn' | 'loop';
