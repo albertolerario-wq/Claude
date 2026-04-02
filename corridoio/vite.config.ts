@@ -1,8 +1,13 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
+// VITE_BASE_PATH is set during CI (GitHub Pages) to '/Claude/'
+// On Replit / local dev it defaults to '/'
 export default defineConfig({
   plugins: [react()],
-  base: '/corridoio/',
+  base: process.env.VITE_BASE_PATH ?? '/',
+  server: {
+    host: true,   // bind 0.0.0.0 — required for Replit
+    port: 5173,
+  },
 })

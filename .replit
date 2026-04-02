@@ -1,0 +1,7 @@
+# Corridoio — Replit config
+run = "cd corridoio && npm install && npm run dev"
+entrypoint = "corridoio/src/main.tsx"
+
+[[ports]]
+localPort = 5173
+externalPort = 80
