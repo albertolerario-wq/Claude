@@ -10,12 +10,14 @@ interface Props extends NavProps {
 }
 
 const MODULE_CARDS = [
-  { id: 'entropia',      label: 'Entropia',          desc: 'Sonno, corpo, carico allostatico',  screen: 'entropia'      as const },
-  { id: 'slot',          label: 'Slot',               desc: 'Timer 20 minuti, pensiero libero',  screen: 'slot'          as const },
-  { id: 'phi',           label: 'φ_rel',              desc: 'Integrazione relazionale',          screen: 'phi'           as const },
-  { id: 'bordi',         label: 'Bordi',              desc: 'Posizioni ai margini del sapere',   screen: 'bordi'         as const },
-  { id: 'interesse',     label: 'Interesse Composto', desc: 'Trend a 90 giorni',                 screen: 'interesse'     as const },
-  { id: 'impermanenza',  label: '◌ Impermanenza',     desc: 'finitezza come struttura',          screen: 'impermanenza'  as const },
+  { id: 'flowchart',     label: '? In difficoltà',   desc: 'tre domande per uscire dal loop',   screen: 'flowchart'     as const, accent: '#1a1a1a' },
+  { id: 'entropia',      label: 'Entropia',          desc: 'sonno, corpo, carico',              screen: 'entropia'      as const, accent: '#e8622a' },
+  { id: 'slot',          label: 'Slot',               desc: 'timer 20 min, pensiero libero',     screen: 'slot'          as const, accent: '#e8622a' },
+  { id: 'phi',           label: 'φ_rel',              desc: 'integrazione relazionale',          screen: 'phi'           as const, accent: '#e8622a' },
+  { id: 'bordi',         label: 'Bordi',              desc: 'posizioni ai margini del sapere',   screen: 'bordi'         as const, accent: '#e8622a' },
+  { id: 'interesse',     label: 'Interesse Composto', desc: 'trend a 90 giorni',                 screen: 'interesse'     as const, accent: '#e8622a' },
+  { id: 'impermanenza',  label: '◌ Impermanenza',     desc: 'finitezza come struttura',          screen: 'impermanenza'  as const, accent: '#555' },
+  { id: 'cosmic-pos',    label: '· Posizione cosmica',desc: 'dove sei nel corridoio QM-GR',      screen: 'cosmic-position' as const, accent: '#3d5a80' },
 ];
 
 function MetricBar({ label, value, prev }: { label: string; value: number; prev?: number }) {
@@ -39,6 +41,17 @@ function MetricBar({ label, value, prev }: { label: string; value: number; prev?
       </div>
     </div>
   );
+}
+
+async function shareApp() {
+  const url = window.location.href;
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: 'CORRIDOIO', text: 'monitoraggio psicofisico personale', url });
+    } catch { /* cancelled */ }
+  } else {
+    try { await navigator.clipboard.writeText(url); alert('Link copiato'); } catch { /* ignore */ }
+  }
 }
 
 export default function Home({ navigate, appState }: Props) {
@@ -68,7 +81,7 @@ export default function Home({ navigate, appState }: Props) {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 pb-24">
+    <div className="max-w-2xl mx-auto px-4 pb-32">
       {/* Header */}
       <div className="flex items-center justify-between py-4">
         <div>
@@ -77,7 +90,6 @@ export default function Home({ navigate, appState }: Props) {
             className="text-xl font-medium text-[#1a1a1a] hover:text-[#e8622a] transition-colors duration-200"
             style={{ fontFamily: "'EB Garamond', Georgia, serif" }}
             aria-label="Apri diagramma cosmologico"
-            title="Long press per diagramma cosmologico"
           >
             Corridoio
           </button>
@@ -90,21 +102,31 @@ export default function Home({ navigate, appState }: Props) {
             </span>
           )}
           <button
-            onClick={() => navigate('history')}
-            className="text-xs text-[#888] px-3 py-2 rounded-lg hover:bg-[#eee] transition-colors duration-200"
-            aria-label="Apri log storico"
+            onClick={shareApp}
+            className="text-xs text-[#aaa] px-2.5 py-2 rounded-lg hover:bg-[#eee] transition-colors duration-200"
+            aria-label="Condividi app"
+            title="Condividi il link — ogni utente ha i propri dati"
           >
-            Log
+            ↑ condividi
           </button>
           <button
             onClick={() => navigate('checkin')}
             className="text-sm px-4 py-2 bg-[#e8622a] text-white rounded-lg font-medium hover:bg-[#d45520] transition-colors duration-200"
             aria-label="Apri check-in giornaliero"
           >
-            Check-in
+            {today ? '↺ check-in' : '+ check-in'}
           </button>
         </div>
       </div>
+
+      {/* No data nudge */}
+      {!today && (
+        <div className="mb-4 px-4 py-3 bg-[#f7f6f2] border border-[#e8e8e0] rounded-xl">
+          <p className="text-xs text-[#888]" style={{ fontFamily:"'EB Garamond',Georgia,serif" }}>
+            Nessun check-in oggi. I moduli usano i dati di ieri come riferimento.
+          </p>
+        </div>
+      )}
 
       {/* Group name */}
       {mode === 'gruppo' && groupName && (
@@ -246,14 +268,17 @@ export default function Home({ navigate, appState }: Props) {
           <button
             key={card.id}
             onClick={() => navigate(card.screen)}
-            className="p-4 bg-white rounded-lg text-left hover:shadow-md transition-all duration-200 group"
+            className="p-4 bg-white rounded-xl text-left hover:shadow-md transition-all duration-200 group"
             style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
             aria-label={`Apri modulo ${card.label}`}
           >
-            <div className="text-sm font-medium text-[#1a1a1a] mb-1 group-hover:text-[#e8622a] transition-colors duration-200">
+            <div
+              className="text-sm font-medium mb-1 transition-colors duration-200"
+              style={{ color: card.accent }}
+            >
               {card.label}
             </div>
-            <div className="text-xs text-[#999] leading-tight">{card.desc}</div>
+            <div className="text-xs text-[#aaa] leading-tight">{card.desc}</div>
           </button>
         ))}
 
@@ -261,33 +286,36 @@ export default function Home({ navigate, appState }: Props) {
         {mode === 'gruppo' && (
           <button
             onClick={() => navigate('progetto')}
-            className="p-4 bg-white rounded-lg text-left hover:shadow-md transition-all duration-200 group"
+            className="p-4 bg-white rounded-xl text-left hover:shadow-md transition-all duration-200"
             style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
             aria-label="Apri modulo Progetto Gruppo"
           >
-            <div className="text-sm font-medium text-[#1a1a1a] mb-1 group-hover:text-[#3d5a80] transition-colors duration-200">
+            <div className="text-sm font-medium text-[#3d5a80] mb-1">
               Progetto Gruppo
             </div>
-            <div className="text-xs text-[#999] leading-tight">Posto fisico, problemi, semaforo</div>
+            <div className="text-xs text-[#aaa] leading-tight">posto fisico, problemi, semaforo</div>
           </button>
         )}
 
         {/* Settings */}
         <button
-          onClick={() => {
-            const dark = !settings.darkMode;
-            appState.updateSettings({ darkMode: dark });
-          }}
-          className="p-4 bg-white rounded-lg text-left hover:shadow-md transition-all duration-200"
+          onClick={() => appState.updateSettings({ darkMode: !settings.darkMode })}
+          className="p-4 bg-white rounded-xl text-left hover:shadow-md transition-all duration-200"
           style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
           aria-label="Toggle dark mode"
         >
-          <div className="text-sm font-medium text-[#1a1a1a] mb-1">
-            {settings.darkMode ? 'Modalità chiara' : 'Modalità scura'}
+          <div className="text-sm font-medium text-[#aaa] mb-1">
+            {settings.darkMode ? '◑ chiaro' : '◐ scuro'}
           </div>
-          <div className="text-xs text-[#999] leading-tight">Aspetto visivo</div>
+          <div className="text-xs text-[#ccc] leading-tight">aspetto visivo</div>
         </button>
       </div>
+
+      {/* Share info */}
+      <p className="mt-6 text-xs text-[#ccc] text-center"
+        style={{ fontFamily:"'JetBrains Mono','Courier New',monospace" }}>
+        ogni utente tiene i propri dati sul suo dispositivo
+      </p>
     </div>
   );
 }
