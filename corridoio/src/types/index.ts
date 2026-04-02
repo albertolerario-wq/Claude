@@ -86,7 +86,8 @@ export type Screen =
   | 'history'
   | 'cosmic'
   | 'impermanenza'
-  | 'cosmic-position';
+  | 'cosmic-position'
+  | 'flowchart';
 
 export interface DiagnosisResult {
   status: 'stable' | 'warn' | 'loop';
