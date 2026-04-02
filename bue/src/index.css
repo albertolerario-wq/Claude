@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #0e0c09;
+  --paper: #d8d0c0;
+  --paper-dim: #8a8070;
+  --paper-ghost: #2a2620;
+  --vermilion: #c85428;
+  --vermilion-dim: #7a3018;
+  --border: #2a2620;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  background-color: var(--ink);
+  color: var(--paper);
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 18px;
+  line-height: 1.65;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100dvh;
+}
+
+/* Enso animation */
+@keyframes enso-draw {
+  from { stroke-dashoffset: 240; }
+  to   { stroke-dashoffset: 0; }
+}
+
+.enso-stroke {
+  animation: enso-draw 2s ease-out forwards;
+}
+
+/* Fade in */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+}
+
+/* Stage node pulse */
+@keyframes node-pulse {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; }
+}
+
+.node-active {
+  animation: node-pulse 2s ease-in-out infinite;
+}
+
+/* Breathing guide */
+@keyframes breath-expand {
+  0%, 100% { transform: scale(1);   opacity: 0.4; }
+  50%       { transform: scale(1.4); opacity: 0.9; }
+}
+
+.breath-circle {
+  animation: breath-expand var(--breath-dur, 8s) ease-in-out infinite;
+}
+
+/* Smooth scrollbar */
+.scroll-thin::-webkit-scrollbar { width: 3px; }
+.scroll-thin::-webkit-scrollbar-track { background: transparent; }
+.scroll-thin::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* Textarea ephemeral */
+textarea.ephemeral {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--paper);
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  resize: none;
+  width: 100%;
+  caret-color: var(--vermilion);
+}
+
+textarea.ephemeral::placeholder {
+  color: var(--paper-dim);
+  opacity: 0.4;
+}
