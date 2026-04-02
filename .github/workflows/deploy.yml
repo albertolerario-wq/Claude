@@ -1,11 +1,9 @@
-name: Deploy Corridoio to GitHub Pages
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches:
       - main
-    paths:
-      - 'corridoio/**'
   workflow_dispatch:
 
 permissions:
@@ -28,19 +26,24 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: npm
-          cache-dependency-path: corridoio/package-lock.json
 
-      - name: Install dependencies
-        run: npm ci
-        working-directory: corridoio
-
-      - name: Build
-        run: npm run build
+      - name: Build Corridoio
+        run: npm ci && npm run build
         working-directory: corridoio
         env:
-          # GitHub Pages URL = https://albertolerario-wq.github.io/Claude/
           VITE_BASE_PATH: /Claude/
+
+      - name: Build Bue
+        run: npm ci && npm run build
+        working-directory: bue
+        env:
+          VITE_BASE_PATH: /Claude/bue/
+
+      - name: Assemble site
+        run: |
+          mkdir -p _site/bue
+          cp -r corridoio/dist/. _site/
+          cp -r bue/dist/. _site/bue/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -48,7 +51,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: corridoio/dist
+          path: _site
 
   deploy:
     environment:
